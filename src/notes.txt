@@ -1,0 +1,51 @@
+// In your login.tsx, after successful login: passing username to dashboard
+navigate('/dashboard', { state: { username: username } });
+
+// In your Dashboard.tsx:
+import { useLocation } from 'react-router-dom';
+
+const Dashboard = () => {
+  const location = useLocation();
+  const username = location.state?.username;
+
+  return (
+    <div>
+      {/* ... other dashboard content ... */}
+      <ProfileMenu username={username} /> {/* Pass the username to your profile menu */}
+    </div>
+  );
+};
+-----------------------------------------
+// Create a UserContext:
+import { createContext, useContext, useState } from 'react';
+
+const UserContext = createContext<{username: string | null, setUsername:  React.Dispatch<React.SetStateAction<string | null>> | null}>({username: null, setUsername: null});
+
+// Wrap your application with the provider:
+const App = () => {
+ const [username, setUsername] = useState<string | null>(null);
+ return (
+    <UserContext.Provider value={{ username, setUsername }}>
+      {/* ... your app components ... */}
+    </UserContext.Provider>
+  );
+};
+
+// In Login.tsx:
+import { useContext } from 'react';
+
+// ... after successful login:
+const { setUsername } = useContext(UserContext);
+setUsername(username);
+
+
+// In Dashboard.tsx:
+import { useContext } from 'react';
+
+const Dashboard = () => {
+  const { username } = useContext(UserContext);
+  return <ProfileMenu username={username} />;
+};
+
+-----------------------------------
+ 
